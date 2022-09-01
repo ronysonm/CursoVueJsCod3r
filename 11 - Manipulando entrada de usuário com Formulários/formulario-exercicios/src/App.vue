@@ -2,7 +2,7 @@
 	<div id="app">
 		<h1>Registrar Reclamação</h1>
 		<div class="conteudo">
-			<form class="painel">
+			<form class="painel" v-if="!enviado">
 				<div class="cabecalho">Formulário</div>
 				<Rotulo nome="E-mail">
 					<input type="text" v-model.lazy.trim="usuario.email">
@@ -18,9 +18,9 @@
 				</Rotulo>
 				<Rotulo nome="Características do Problema">
 					<span class="mr-4"><input type="checkbox" value="reproduzivel" v-model="caracteristicas">
-					 Reproduzível</span>
-					<span><input type="checkbox" value="intermitente" v-model="caracteristicas"> 
-					Intermitente</span>
+						Reproduzível</span>
+					<span><input type="checkbox" value="intermitente" v-model="caracteristicas">
+						Intermitente</span>
 				</Rotulo>
 				<Rotulo nome="Qual produto?">
 					<span class="mr-4"><input type="radio" value="web" v-model="produto"> Web</span>
@@ -29,20 +29,17 @@
 				</Rotulo>
 				<Rotulo nome="Prioridade">
 					<select v-model="prioridade">
-						<option v-for="prioridade in prioridades"
-						:value="prioridade.id"
-						:key="prioridade.id"
-						:selected="prioridade.id === 1"
-						>{{ prioridade.nome }}</option>
+						<option v-for="prioridade in prioridades" :value="prioridade.id" :key="prioridade.id"
+							:selected="prioridade.id === 1">{{ prioridade.nome }}</option>
 					</select>
 				</Rotulo>
 				<Rotulo nome="Primeira Reclamação?">
-					<Escolha />
+					<Escolha v-model="value" />
 				</Rotulo>
 				<hr>
-				<button>Enviar</button>
+				<button @click.prevent="enviar">Enviar</button>
 			</form>
-			<div class="painel">
+			<div class="painel" v-else>
 				<div class="cabecalho">Resultado</div>
 				<Rotulo nome="E-mail">
 					<span>{{ usuario.email }}</span>
@@ -51,15 +48,16 @@
 					<span>{{ usuario.senha }}</span>
 				</Rotulo>
 				<Rotulo nome="Idade">
-					<span>{{ usuario.idade }}  {{ tipoIdade }}</span>
+					<span>{{ usuario.idade }} {{ tipoIdade }}</span>
 				</Rotulo>
 				<Rotulo nome="Mensagem">
 					<span style="white-space : pre">{{ mensagem }}</span>
 				</Rotulo>
 				<Rotulo nome="Marque as Opções">
-					<span>	<ul>
-								<li v-for="c in caracteristicas" :key="c">{{ c }}</li>
-							</ul>
+					<span>
+						<ul>
+							<li v-for="c in caracteristicas" :key="c">{{ c }}</li>
+						</ul>
 					</span>
 				</Rotulo>
 				<Rotulo nome="Qual produto?">
@@ -69,7 +67,7 @@
 					<span>{{ prioridade }}</span>
 				</Rotulo>
 				<Rotulo nome="Primeira Reclamação?">
-					<span>???</span>
+					<span>{{ value }}</span>
 				</Rotulo>
 			</div>
 		</div>
@@ -81,88 +79,95 @@ import Rotulo from "./components/Rotulo.vue";
 import Escolha from "./components/Escolha.vue";
 
 export default {
-  name: "app",
-  components: { Rotulo, Escolha },
-  computed: {
-    tipoIdade() {
-      return typeof this.usuario.idade;
-    },
-  },
-  data() {
-    return {
-      mensagem: "",
-      caracteristicas: [],
-      produto: [],
-      prioridade: 3,
-      prioridades: [
-        { id: 1, nome: "Alta" },
-        { id: 2, nome: "Média" },
-        { id: 3, nome: "Baixa" },
-      ],
-      usuario: {
-        email: "",
-        senha: "",
-        idade: 25,
-      },
-    };
-  },
+	name: "app",
+	components: { Rotulo, Escolha },
+	computed: {
+		tipoIdade() {
+			return typeof this.usuario.idade;
+		},
+	},
+	methods: {
+		enviar() {
+			this.enviado = true
+		}
+	},
+	data() {
+		return {
+			mensagem: "",
+			caracteristicas: [],
+			produto: [],
+			prioridade: 3,
+			value: true,
+			prioridades: [
+				{ id: 1, nome: "Alta" },
+				{ id: 2, nome: "Média" },
+				{ id: 3, nome: "Baixa" },
+			],
+			usuario: {
+				email: "",
+				senha: "",
+				idade: 25,
+			},
+			enviado: false
+		};
+	},
 };
 </script>
 
 <style>
 body {
-  background-color: #ececec;
+	background-color: #ececec;
 }
 
 #app {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+	font-family: "Avenir", Helvetica, Arial, sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	text-align: center;
+	color: #2c3e50;
 
-  display: flex;
-  flex-direction: column;
+	display: flex;
+	flex-direction: column;
 }
 
 .conteudo {
-  display: flex;
+	display: flex;
 }
 
 .painel {
-  flex: 1;
-  background: #fff;
-  margin: 0px 10px;
-  padding: 20px;
-  border: 1px solid #aaa;
-  border-radius: 5px;
+	flex: 1;
+	background: #fff;
+	margin: 0px 10px;
+	padding: 20px;
+	border: 1px solid #aaa;
+	border-radius: 5px;
 }
 
 .painel .cabecalho {
-  width: 100%;
-  background-color: #ddd;
-  padding: 10px 0px;
-  border-radius: 5px;
-  font-size: 1.4rem;
+	width: 100%;
+	background-color: #ddd;
+	padding: 10px 0px;
+	border-radius: 5px;
+	font-size: 1.4rem;
 }
 
 #app form button {
-  float: right;
-  margin: 10px 0px;
-  padding: 10px 20px;
-  font-size: 1.4rem;
-  border-radius: 5px;
-  color: #fff;
-  background-color: #2196f3;
+	float: right;
+	margin: 10px 0px;
+	padding: 10px 20px;
+	font-size: 1.4rem;
+	border-radius: 5px;
+	color: #fff;
+	background-color: #2196f3;
 }
 
 #app h1 {
-  font-weight: 200;
-  margin: 20px;
-  padding: 0;
+	font-weight: 200;
+	margin: 20px;
+	padding: 0;
 }
 
 .mr-4 {
-  margin-right: 40px;
+	margin-right: 40px;
 }
 </style>
